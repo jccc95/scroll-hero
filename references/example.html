@@ -389,13 +389,17 @@ function revealHeroVideo(){
   requestAnimationFrame(()=>{heroVideo.style.transform='';scheduleRender();});
 }
 
-function settleHeroVideo(){
-  heroVideo.pause();
-  heroVideo.currentTime=0;
-  requestAnimationFrame(revealHeroVideo);
+function syncHeroVideoToScroll(){
+  updateHeroVideo(window.scrollY);
+  scheduleRender();
 }
 
-heroVideo.addEventListener('loadedmetadata',()=>{hvReady=true;heroVideo.currentTime=0;scheduleRender();});
+function settleHeroVideo(){
+  heroVideo.pause();
+  requestAnimationFrame(()=>{revealHeroVideo();syncHeroVideoToScroll();});
+}
+
+heroVideo.addEventListener('loadedmetadata',()=>{hvReady=true;syncHeroVideoToScroll();});
 heroVideo.addEventListener('loadeddata',()=>{const p=heroVideo.play();if(p&&p.then)p.then(settleHeroVideo).catch(settleHeroVideo);else settleHeroVideo();});
 panelVideo.addEventListener('loadedmetadata',()=>{pvReady=true;panelVideo.currentTime=0;scheduleRender();});
 panelVideo.addEventListener('loadeddata',()=>{const p=panelVideo.play();if(p&&p.then)p.then(()=>{panelVideo.pause();panelVideo.currentTime=0;}).catch(()=>{});});
