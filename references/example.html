@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll Hero Template</title>
+<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+<style>
+/* === RESET === */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { background:#000; color:#fff; font-family:'Michroma',sans-serif; }
+body { background:#000; overflow-x:hidden; }
+
+/* === NAV === */
+.nav { position:fixed; top:0; left:0; width:100%; z-index:100; display:flex; justify-content:space-between; padding:28px 48px; }
+.nav-logo { font-size:14px; letter-spacing:2px; text-transform:uppercase; }
+.nav-links { display:flex; gap:40px; }
+.nav-links a { color:rgba(255,255,255,0.7); text-decoration:none; font-size:13px; text-transform:uppercase; }
+
+/* === HERO (sticky) === */
+.hero { position:sticky; top:0; height:100vh; overflow:hidden; background:radial-gradient(circle at 68% 26%, rgba(62,92,255,.34), transparent 28%), radial-gradient(circle at 26% 76%, rgba(151,37,255,.24), transparent 34%), linear-gradient(135deg, #141827 0%, #05060b 52%, #010102 100%); }
+.hero-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.hero-headline { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); z-index:1; display:flex; gap:.25em; font-size:clamp(2rem,5vw,6rem); text-transform:uppercase; white-space:nowrap; }
+.hero-headline .char { display:inline-block; }
+.hero-spacer { pointer-events:none; }
+
+/* === HERO BUTTONS === */
+.hero-btns { position:absolute; left:12%; top:30%; display:flex; flex-direction:column; gap:18px; transform:translateY(calc(-50% + 20px)) scale(.97); z-index:2; opacity:0; pointer-events:none; transition:opacity .45s ease,transform .6s cubic-bezier(.22,1,.36,1); }
+.hero-btns.revealed { opacity:1; pointer-events:auto; transform:translateY(-50%) scale(1); }
+.hero-btn { width:32vw; max-width:440px; height:72px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.46); border-radius:16px; backdrop-filter:blur(16px) saturate(140%); -webkit-backdrop-filter:blur(16px) saturate(140%); box-shadow:0 14px 34px rgba(6,12,31,.18),inset 0 1px 0 rgba(255,255,255,.32); color:#fff; font-family:'Michroma',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; text-shadow:0 1px 12px rgba(0,0,0,.25); transform-origin:left center; transition:transform .45s cubic-bezier(.34,1.56,.64,1),background .25s,border-color .25s; }
+.hero-btn:hover { background:rgba(255,255,255,.3); border-color:rgba(255,255,255,.7); }
+.hero-btn:focus-visible, .nav-links a:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+.hero-btn.stretch { transform:scale(1.35,1.2); z-index:5; }
+.hero-btn.avoid-up { transform:translateY(-22px); }
+.hero-btn.avoid-down { transform:translateY(22px); }
+
+/* === PANEL === */
+.panel { position:fixed; inset:0; z-index:10; border-radius:36px 36px 0 0; overflow:hidden; transform-origin:center bottom; will-change:transform,opacity; }
+.panel-bg { position:absolute; inset:0; }
+.panel-bg video { width:100%; height:100%; object-fit:cover; position:relative; z-index:2; }
+.panel-overlay { position:absolute; inset:0; z-index:3; background:radial-gradient(ellipse at 30% 50%, transparent 50%, rgba(0,0,0,0.3) 100%); pointer-events:none; }
+.panel-spacer { pointer-events:none; }
+
+/* === TEXT DRUM === */
+.drum-container { position:absolute; left:27%; top:0; width:44%; height:100%; transform:translateX(-50%); z-index:4; display:flex; align-items:center; perspective:1000px; }
+.drum-viewport { position:relative; width:100%; height:420px; transform-style:preserve-3d; }
+.drum-line { position:absolute; left:0; top:50%; width:100%; white-space:nowrap; font-family:'PingFang SC','Microsoft YaHei',sans-serif; font-size:clamp(18px,1.7vw,24px); letter-spacing:-.035em; transform-origin:center center; }
+.drum-line .kw { color:#fff; font-weight:700; }
+.drum-line .txt { color:rgba(255,255,255,0.6); }
+
+@media(max-width:768px) {
+  .nav { padding:20px 24px; } .nav-links { gap:20px; } .nav-links a { font-size:11px; }
+  .hero-headline { bottom:30px; font-size:clamp(1.4rem,4vw,2.5rem); }
+  .hero-btns { left:8%; top:25%; gap:12px; }
+  .hero-btn { width:45vw; max-width:240px; height:50px; font-size:11px; }
+  .hero-btn.stretch { transform:scale(1.25,1.15); }
+  .hero-btn.avoid-up { transform:translateY(-16px); }
+  .hero-btn.avoid-down { transform:translateY(16px); }
+  .drum-container { left:7%; width:74%; }
+  .drum-line { font-size:clamp(15px,3.4vw,19px); }
+}
+
+@media(max-width:600px) {
+  .nav { padding:calc(12px + env(safe-area-inset-top)) 16px 12px; align-items:center; }
+  .nav-logo { font-size:11px; letter-spacing:1.5px; }
+  .nav-links { gap:12px; }
+  .nav-links a { font-size:9px; letter-spacing:.3px; }
+
+  .hero { height:100svh; min-height:100svh; }
+  .hero-video { object-position:58% center; }
+  .hero-headline { bottom:calc(20px + env(safe-area-inset-bottom)); font-size:clamp(1.6rem,9vw,2.4rem); gap:.12em; }
+  .hero-btns { top:34%; left:18px; gap:10px; }
+  .hero-btn { width:min(62vw,250px); height:48px; border-radius:10px; font-size:10px; letter-spacing:1.4px; }
+
+  .panel { border-radius:24px 24px 0 0; }
+  .panel-bg video { object-position:62% center; }
+  .panel-overlay { background:linear-gradient(90deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.1) 100%); }
+  .drum-container { left:48%; top:20%; width:90%; height:60%; }
+  .drum-viewport { height:360px; }
+  .drum-line { width:76%; white-space:normal; line-height:1.35; font-size:clamp(15px,4.2vw,19px); }
+}
+
+@media(hover:none) and (pointer:coarse) {
+  .hero-btn:hover { background:#fff; }
+  .hero-btn.stretch, .hero-btn.avoid-up, .hero-btn.avoid-down { transform:none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; }
+  .hero-btn.stretch, .hero-btn.avoid-up, .hero-btn.avoid-down { transform:none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Primary navigation">
+  <div class="nav-logo">BRAND</div>
+  <div class="nav-links">
+    <a href="#about">About</a><a href="#vision">Vision</a><a href="#journal">Journal</a><a href="#connect">Connect</a>
+  </div>
+</nav>
+
+<div class="hero-wrapper">
+  <section class="hero" id="hero">
+    <video class="hero-video" id="heroVideo" muted playsinline preload="auto">
+      <source src="../mp4/0001.mp4" type="video/mp4">
+    </video>
+    <div class="hero-btns" id="heroBtns">
+      <button class="hero-btn" type="button">Explore</button>
+      <button class="hero-btn" type="button">Journal</button>
+      <button class="hero-btn" type="button">Connect</button>
+    </div>
+    <div class="hero-headline" id="heroHeadline"></div>
+  </section>
+  <div class="hero-spacer" id="heroSpacer"></div>
+</div>
+
+<div class="panel-spacer" id="panelSpacer"></div>
+
+<div class="panel" id="panel">
+  <div class="panel-bg">
+    <div class="panel-bg-fallback" style="position:absolute;inset:0;background:linear-gradient(180deg,#0a0a0a,#020212,#000);"></div>
+    <video id="panelVideo" muted playsinline preload="none">
+      <source data-src="../mp4/222.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="panel-overlay"></div>
+  <div class="drum-container">
+    <div class="drum-viewport" id="drumViewport"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+// ═══ CONFIG ═══
+const C = {
+  VIDEO_SPEED: 2,        // 视频跨度 = SPEED × vh
+  BUTTON_REVEAL_PROGRESS: .62,
+  VIDEO_SEEK_THRESHOLD: .045,
+  HERO_SPACER: 300,      // hero-spacer = VIDEO_SPEED×100 + pause
+  LERP: 0.15,
+  DRUM_R: 380,
+  DRUM_SPACING: 64,
+  DRUM_VISIBLE: 6,
+  RISE_RANGE: 1.2,       // 面板升起跨度(vh)
+};
+
+// ═══ DOM ═══
+const hero = document.getElementById('hero');
+const heroVideo = document.getElementById('heroVideo');
+const heroBtns = document.getElementById('heroBtns');
+const heroHeadline = document.getElementById('heroHeadline');
+const heroSpacer = document.getElementById('heroSpacer');
+const panel = document.getElementById('panel');
+const panelVideo = document.getElementById('panelVideo');
+const panelSpacer = document.getElementById('panelSpacer');
+const drumViewport = document.getElementById('drumViewport');
+
+// ═══ MANIFESTO ═══
+const lines = [
+  "我在[雨夜]的纸箱里醒来，听见城市的车声。",
+  "纸箱很潮，我把尾巴压在肚子下面，假装自己不冷。",
+  "那时我还不知道，[灯光]会比月亮更近。",
+  "一双手停在我面前，掌心带着一点雨水的温度。",
+  "我没有立刻靠近，只用鼻子记住了它的[气味]。",
+  "后来，那双手把我带进一间有光、有风、也有笑声的屋子。",
+  "我第一次喝到温热的水，第一次睡在不用躲雨的[毯子]上。",
+  "我也第一次知道，原来门关上以后，人还会再回来。",
+  "从那天起，我开始在[清晨]叫醒你。",
+  "不是因为饿，只是阳光来了，我觉得你也该看看。",
+  "你总会皱着眉把我抱开，我就把爪子轻轻放在你脸上。",
+  "午后最安静的时候，我喜欢趴在窗台上，追一块移动的[光点]。",
+  "窗外的鸟飞得很快，可我不急着抓住它们。",
+  "我只是想让它们知道，这扇窗后有一只认真生活的猫。",
+  "我把[沙发]当王座，也把纸箱当成秘密基地。",
+  "你买回来的每一个新东西，我都会先检查一遍。",
+  "不是因为好奇，是因为这个家有一半归我管理。",
+  "每次你要出门，我都会坐在门口，假装只是路过。",
+  "可门一关，我就会听着走廊里的脚步，等那串[熟悉的声音]回来。",
+  "有时你很晚才回家，身上带着风和疲惫。",
+  "我不会问你去了哪里，只会把尾巴绕在你的[手边]。",
+  "你坐下时，我就跳到你腿上，把呼噜声留给你。",
+  "我不懂你说的那些复杂的话，却懂你沉默时的重量。",
+  "所以你难过的时候，我会待在旁边，什么也不做。",
+  "有时我像闪电，穿过房间追逐一根[羽毛]。",
+  "有时我又像一团影子，安静守着你翻完最后一页书。",
+  "你总说我不说话，可我把每一次[拥抱]都记得很清楚。",
+  "我记得你生病时没有力气起床，也记得你抱着我哭过的夜。",
+  "我没有办法替你解决什么，只能把自己放在你身边。",
+  "因为对我来说，[陪伴]就是最郑重的承诺。",
+  "我的世界其实不大：一扇窗、一只碗、一块暖和的地毯。",
+  "还有你回家时弯下腰，叫我名字的那个瞬间。",
+  "如果有一天我跑得慢了，跳不上窗台了，请别担心。",
+  "我只是把更多时间留给了看着你。",
+  "毕竟从那个雨夜开始，你就是我全部的[宇宙]。",
+  "而我，会用这一生，认真地爱着[你]。",
+];
+
+// ═══ STATE ═══
+let charSpans=[], drumEls=[];
+let hvReady=false, pvReady=false;
+let contentEnd=0, drumRange=1, renderQueued=false, layoutQueued=false, panelVideoLoaded=false;
+let reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const videoSeekStates=new WeakMap();
+
+// ═══ UTILS ═══
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+function seekVideoAtProgress(video,progress){
+  if(!Number.isFinite(video.duration))return;
+  const targetTime=progress*video.duration;
+  requestVideoSeek(video,targetTime);
+}
+
+function requestVideoSeek(video,targetTime){
+  let state=videoSeekStates.get(video);
+  if(!state){
+    state={isSeeking:false,pendingTarget:null};
+    videoSeekStates.set(video,state);
+  }
+  if(state.isSeeking){
+    state.pendingTarget=targetTime;
+    return;
+  }
+  if(Math.abs(video.currentTime-targetTime)<C.VIDEO_SEEK_THRESHOLD)return;
+  state.isSeeking=true;
+  try{
+    if(typeof video.fastSeek==='function')video.fastSeek(targetTime);
+    else video.currentTime=targetTime;
+  }catch{
+    video.currentTime=targetTime;
+  }
+}
+
+function handleVideoSeeked(event){
+  const video=event.currentTarget;
+  const state=videoSeekStates.get(video);
+  if(!state)return;
+  state.isSeeking=false;
+  const targetTime=state.pendingTarget;
+  state.pendingTarget=null;
+  if(targetTime!==null)requestVideoSeek(video,targetTime);
+}
+
+function createManifestoFragment(text){
+  const fragment=document.createDocumentFragment();
+  text.split(/(\[.*?\])/g).forEach(part=>{
+    const span=document.createElement('span');
+    const isKeyword=part.startsWith('[')&&part.endsWith(']');
+    span.className=isKeyword?'kw':'txt';
+    span.textContent=isKeyword?part.slice(1,-1):part;
+    fragment.appendChild(span);
+  });
+  return fragment;
+}
+
+function updateLayout(){
+  heroSpacer.style.height=C.HERO_SPACER+'vh';
+  drumRange=Math.max((lines.length-1)*C.DRUM_SPACING,1);
+  panelSpacer.style.height=(drumRange+window.innerHeight*1.5)+'px';
+  contentEnd=window.innerHeight+heroSpacer.offsetHeight;
+}
+
+function loadPanelVideo(){
+  if(panelVideoLoaded)return;
+  panelVideo.querySelectorAll('source[data-src]').forEach(source=>{source.src=source.dataset.src;});
+  panelVideoLoaded=true;
+  panelVideo.load();
+}
+
+// ═══ INIT ═══
+function init(){
+  // split headline chars
+  const text='BRAND NAME';
+  heroHeadline.innerHTML='';
+  text.split('').forEach(ch=>{
+    const s=document.createElement('span');
+    s.className='char'; s.textContent=ch===' '?' ':ch;
+    s.style.display='inline-block'; heroHeadline.appendChild(s);
+    charSpans.push(s);
+  });
+
+  // render drum lines
+  drumViewport.innerHTML='';
+  lines.forEach(t=>{
+    const el=document.createElement('div'); el.className='drum-line';
+    if(!t.trim()){ el.style.opacity='0'; drumViewport.appendChild(el); drumEls.push(el); return; }
+    el.appendChild(createManifestoFragment(t));
+    drumViewport.appendChild(el); drumEls.push(el);
+  });
+
+  updateLayout();
+
+  // button hover
+  document.querySelectorAll('.hero-btn').forEach((b,i,a)=>{b.addEventListener('mouseenter',()=>{b.classList.add('stretch');a.forEach((o,j)=>{if(j<i)o.classList.add('avoid-up');if(j>i)o.classList.add('avoid-down');});});b.addEventListener('mouseleave',()=>{b.classList.remove('stretch');a.forEach(o=>o.classList.remove('avoid-up','avoid-down'));});});
+}
+
+// ═══ UPDATE ═══
+function updateHeroVideo(sy){
+  if(!hvReady)return;
+  const progress=clamp(sy/(C.VIDEO_SPEED*window.innerHeight),0,1);
+  seekVideoAtProgress(heroVideo,progress);
+}
+
+function updateHeroChars(sy){
+  if(reducedMotion){
+    charSpans.forEach(el=>{el.style.transform='';el.style.opacity='';});
+    return;
+  }
+  const vh=window.innerHeight,ve=C.VIDEO_SPEED*vh;
+  const su=clamp((sy-ve*.75)/(ve*.25),0,1);
+  const aSpan=.25*ve*(1-su*.6);
+  charSpans.forEach((el,i)=>{
+    const st=.5*ve+i*.035*vh*(1-su*.4);
+    const p=clamp((sy-st)/aSpan,0,1);
+    const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    el.style.transform=`translateY(${e*140}px) scaleX(${1+e*.18}) scaleY(${1-e*.22})`;
+    el.style.opacity=1-e;
+  });
+}
+
+function updatePanel(sy){
+  const vh=window.innerHeight;
+  const riseStart=contentEnd-C.RISE_RANGE*vh;
+  const p=clamp((sy-riseStart)/(contentEnd-riseStart),0,1);
+  const eased=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+  const scale=.96+.04*eased;
+  panel.style.transform=`translateY(${(1-eased)*vh}px) scale(${scale})`;
+  panel.style.opacity=.65+.35*eased;
+  if(sy>=riseStart-vh)loadPanelVideo();
+  return p>=1;
+}
+
+function updatePanelVideo(sy,up){
+  if(!pvReady||!up)return;
+  const progress=clamp((sy-contentEnd)/drumRange,0,1);
+  seekVideoAtProgress(panelVideo,progress);
+}
+
+function updateDrum(sy,panelProgress){
+  const fi=panelProgress<1?0:clamp((sy-contentEnd)/drumRange,0,1)*(lines.length-1);
+  drumEls.forEach((el,i)=>{
+    const off=i-fi,ao=Math.abs(off);
+    const a=off*C.DRUM_SPACING/C.DRUM_R;
+    el.style.transform=`translateY(${C.DRUM_R*Math.sin(a)}px) translateZ(${C.DRUM_R*Math.cos(a)-C.DRUM_R}px) rotateX(${a}rad)`;
+    el.style.filter=reducedMotion?'none':`blur(${clamp(ao*2.2,0,18)}px)`;
+    el.style.opacity=clamp(1-(ao-1.5)/C.DRUM_VISIBLE,0,1);
+  });
+}
+
+// ═══ RENDER ═══
+function render(){
+  renderQueued=false;
+  const sy=window.scrollY,vh=window.innerHeight;
+  updateHeroVideo(sy);
+  updateHeroChars(sy);
+  const heroProgress=clamp(sy/(C.VIDEO_SPEED*vh),0,1);
+  heroBtns.classList.toggle('revealed',heroProgress>=C.BUTTON_REVEAL_PROGRESS);
+  const panelProgress=updatePanel(sy);
+  updatePanelVideo(sy,panelProgress>=1);
+  updateDrum(sy,panelProgress);
+}
+
+function scheduleRender(){
+  if(renderQueued||document.hidden)return;
+  renderQueued=true;
+  requestAnimationFrame(render);
+}
+
+function scheduleLayout(){
+  if(layoutQueued)return;
+  layoutQueued=true;
+  requestAnimationFrame(()=>{
+    layoutQueued=false;
+    updateLayout();
+    scheduleRender();
+  });
+}
+
+// ═══ EVENTS ═══
+heroVideo.addEventListener('loadedmetadata',()=>{hvReady=true;heroVideo.currentTime=0;scheduleRender();});
+heroVideo.addEventListener('loadeddata',()=>{const p=heroVideo.play();if(p&&p.then)p.then(()=>{heroVideo.pause();heroVideo.currentTime=0;scheduleRender();}).catch(()=>{});});
+panelVideo.addEventListener('loadedmetadata',()=>{pvReady=true;panelVideo.currentTime=0;scheduleRender();});
+panelVideo.addEventListener('loadeddata',()=>{const p=panelVideo.play();if(p&&p.then)p.then(()=>{panelVideo.pause();panelVideo.currentTime=0;}).catch(()=>{});});
+heroVideo.addEventListener('seeked',handleVideoSeeked);
+panelVideo.addEventListener('seeked',handleVideoSeeked);
+heroVideo.addEventListener('error',()=>{heroVideo.style.display='none';});
+panelVideo.addEventListener('error',()=>{panelVideo.style.display='none';});
+window.addEventListener('scroll',scheduleRender,{passive:true});
+window.addEventListener('resize',scheduleLayout,{passive:true});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRender();});
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',event=>{
+  reducedMotion=event.matches;
+  if(!reducedMotion)loadPanelVideo();
+  scheduleRender();
+});
+
+// ═══ START ═══
+init();
+scheduleRender();
+})();
+</script>
+</body>
+</html>
