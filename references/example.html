@@ -94,9 +94,9 @@ body { background:#000; overflow-x:hidden; }
 <body>
 
 <nav class="nav" aria-label="Primary navigation">
-  <div class="nav-logo">BRAND</div>
+  <div class="nav-logo">牛皮 · NIOPI</div>
   <div class="nav-links">
-    <a href="#about">About</a><a href="#vision">Vision</a><a href="#journal">Journal</a><a href="#connect">Connect</a>
+    <a href="#about">牛皮日常</a><a href="#vision">巡逻领地</a><a href="#journal">猫咪手账</a><a href="#connect">摸摸牛皮</a>
   </div>
 </nav>
 
@@ -106,9 +106,9 @@ body { background:#000; overflow-x:hidden; }
       <source src="../mp4/0001.mp4" type="video/mp4">
     </video>
     <div class="hero-btns" id="heroBtns">
-      <button class="hero-btn" type="button">Explore</button>
-      <button class="hero-btn" type="button">Journal</button>
-      <button class="hero-btn" type="button">Connect</button>
+      <button class="hero-btn" type="button">认识牛皮</button>
+      <button class="hero-btn" type="button">查看巡逻日志</button>
+      <button class="hero-btn" type="button">投喂小鱼干</button>
     </div>
     <div class="hero-headline" id="heroHeadline"></div>
   </section>
@@ -158,7 +158,7 @@ const drumViewport = document.getElementById('drumViewport');
 
 // ═══ MANIFESTO ═══
 const lines = [
-  "我在[雨夜]的纸箱里醒来，听见城市的车声。",
+  "我叫[牛皮]，在[雨夜]的纸箱里醒来，听见城市的车声。",
   "纸箱很潮，我把尾巴压在肚子下面，假装自己不冷。",
   "那时我还不知道，[灯光]会比月亮更近。",
   "一双手停在我面前，掌心带着一点雨水的温度。",
@@ -166,13 +166,13 @@ const lines = [
   "后来，那双手把我带进一间有光、有风、也有笑声的屋子。",
   "我第一次喝到温热的水，第一次睡在不用躲雨的[毯子]上。",
   "我也第一次知道，原来门关上以后，人还会再回来。",
-  "从那天起，我开始在[清晨]叫醒你。",
+  "从那天起，牛皮开始在[清晨]叫醒你。",
   "不是因为饿，只是阳光来了，我觉得你也该看看。",
   "你总会皱着眉把我抱开，我就把爪子轻轻放在你脸上。",
   "午后最安静的时候，我喜欢趴在窗台上，追一块移动的[光点]。",
   "窗外的鸟飞得很快，可我不急着抓住它们。",
   "我只是想让它们知道，这扇窗后有一只认真生活的猫。",
-  "我把[沙发]当王座，也把纸箱当成秘密基地。",
+  "牛皮把[沙发]当王座，也把纸箱当成秘密基地。",
   "你买回来的每一个新东西，我都会先检查一遍。",
   "不是因为好奇，是因为这个家有一半归我管理。",
   "每次你要出门，我都会坐在门口，假装只是路过。",
@@ -187,7 +187,7 @@ const lines = [
   "你总说我不说话，可我把每一次[拥抱]都记得很清楚。",
   "我记得你生病时没有力气起床，也记得你抱着我哭过的夜。",
   "我没有办法替你解决什么，只能把自己放在你身边。",
-  "因为对我来说，[陪伴]就是最郑重的承诺。",
+  "因为对牛皮来说，[陪伴]就是最郑重的承诺。",
   "我的世界其实不大：一扇窗、一只碗、一块暖和的地毯。",
   "还有你回家时弯下腰，叫我名字的那个瞬间。",
   "如果有一天我跑得慢了，跳不上窗台了，请别担心。",
@@ -271,7 +271,7 @@ function loadPanelVideo(){
 // ═══ INIT ═══
 function init(){
   // split headline chars
-  const text='BRAND NAME';
+  const text='牛皮的宇宙';
   heroHeadline.innerHTML='';
   text.split('').forEach(ch=>{
     const s=document.createElement('span');
