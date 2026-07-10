@@ -20,6 +20,8 @@ body { background:#000; overflow-x:hidden; }
 /* === HERO (sticky) === */
 .hero { position:sticky; top:0; height:100vh; overflow:hidden; background:radial-gradient(circle at 68% 26%, rgba(62,92,255,.34), transparent 28%), radial-gradient(circle at 26% 76%, rgba(151,37,255,.24), transparent 34%), linear-gradient(135deg, #141827 0%, #05060b 52%, #010102 100%); }
 .hero-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.hero-poster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; pointer-events:none; opacity:1; transition:opacity .18s ease,visibility .18s step-end; }
+.hero.video-ready .hero-poster { opacity:0; visibility:hidden; }
 .hero-headline { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); z-index:1; display:flex; gap:.25em; font-size:clamp(2rem,5vw,6rem); text-transform:uppercase; white-space:nowrap; }
 .hero-headline .char { display:inline-block; }
 .hero-spacer { pointer-events:none; }
@@ -105,6 +107,7 @@ body { background:#000; overflow-x:hidden; }
     <video class="hero-video" id="heroVideo" poster="../assets/niupi-hero-poster.webp" muted playsinline preload="auto">
       <source src="../mp4/01.faststart.mp4" type="video/mp4">
     </video>
+    <img id="heroPoster" class="hero-poster" src="../assets/niupi-hero-poster.webp" alt="" aria-hidden="true">
     <div class="hero-btns" id="heroBtns">
       <button class="hero-btn" type="button">认识牛皮</button>
       <button class="hero-btn" type="button">查看巡逻日志</button>
@@ -378,8 +381,21 @@ function scheduleLayout(){
 }
 
 // ═══ EVENTS ═══
+function revealHeroVideo(){
+  heroVideo.style.transform='translateZ(0)';
+  void heroVideo.offsetWidth;
+  hero.classList.add('video-ready');
+  requestAnimationFrame(()=>{heroVideo.style.transform='';scheduleRender();});
+}
+
+function settleHeroVideo(){
+  heroVideo.pause();
+  heroVideo.currentTime=0;
+  requestAnimationFrame(revealHeroVideo);
+}
+
 heroVideo.addEventListener('loadedmetadata',()=>{hvReady=true;heroVideo.currentTime=0;scheduleRender();});
-heroVideo.addEventListener('loadeddata',()=>{const p=heroVideo.play();if(p&&p.then)p.then(()=>{heroVideo.pause();heroVideo.currentTime=0;scheduleRender();}).catch(()=>{});});
+heroVideo.addEventListener('loadeddata',()=>{const p=heroVideo.play();if(p&&p.then)p.then(settleHeroVideo).catch(settleHeroVideo);else settleHeroVideo();});
 panelVideo.addEventListener('loadedmetadata',()=>{pvReady=true;panelVideo.currentTime=0;scheduleRender();});
 panelVideo.addEventListener('loadeddata',()=>{const p=panelVideo.play();if(p&&p.then)p.then(()=>{panelVideo.pause();panelVideo.currentTime=0;}).catch(()=>{});});
 heroVideo.addEventListener('seeked',handleVideoSeeked);
