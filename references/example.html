@@ -407,7 +407,8 @@ heroVideo.addEventListener('seeked',handleVideoSeeked);
 panelVideo.addEventListener('seeked',handleVideoSeeked);
 heroVideo.addEventListener('error',()=>{hero.classList.add('video-failed');heroVideo.style.display='none';});
 panelVideo.addEventListener('error',()=>{panelVideo.style.display='none';});
-window.addEventListener('scroll',scheduleRender,{passive:true});
+function handleScroll(){syncHeroVideoToScroll();}
+window.addEventListener('scroll',handleScroll,{passive:true});
 window.addEventListener('resize',scheduleLayout,{passive:true});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRender();});
 window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',event=>{
