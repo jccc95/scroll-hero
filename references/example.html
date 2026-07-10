@@ -301,7 +301,8 @@ function init(){
 // ═══ UPDATE ═══
 function updateHeroVideo(sy){
   if(!hvReady)return;
-  const progress=clamp(sy/(C.VIDEO_SPEED*window.innerHeight),0,1);
+  const heroRange=heroSpacer.offsetHeight;
+  const progress=clamp(sy/heroRange,0,1);
   seekVideoAtProgress(heroVideo,progress);
 }
 
